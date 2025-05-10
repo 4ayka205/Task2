@@ -3,12 +3,12 @@ import qrcode from 'qrcode';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-async function generateQR(text: string, size: number, isSmall: boolean): Promise<void> {
+async function generateQR(text: string, version: number, isSmall: boolean): Promise<void> {
   try {
     const qrArt = await qrcode.toString(text, {
       type: 'terminal',
       small: isSmall,
-      scale: size
+      version: version
     });
     console.log(qrArt);
   } catch (error) {
@@ -27,22 +27,22 @@ const argv = yargs(hideBin(process.argv))
           describe: 'Текст или URL для кодирования',
           type: 'string',
         })
-        .option('size', {
-          alias: 'sz',
+        .option('version', {
+          alias: 'v',
           type: 'number',
-          description: 'Размер QR-кода (1-20)',
+          description: 'Версия QR-кода (1-40)',
           default: 4,
           requiresArg: true
         })
         .option('small', {
-            alias: 'sm',
+            alias: 's',
             type: 'boolean',
             description: 'Полноразмерный вывод',
             default: true
         })
         .example([
           ['npm start -- generate "Hello"', 'Стандартный QR-код'],
-          ['npm start -- generate "https://example.com" -- --size=8', 'Крупный QR-код'],
+          ['npm start -- generate "https://example.com" -- --version=8', 'QR-код версии 8'],
           ['npm start -- generate "Test" -- --no-small', 'Полноразмерный вывод']
         ]);
     },
@@ -52,11 +52,11 @@ const argv = yargs(hideBin(process.argv))
         console.error('Ошибка: Укажите текст или ссылку.');
         process.exit(1);
       }
-      if (argv.size < 1 || argv.size > 20) {
+      if (argv.version < 1 || argv.version > 40) {
         argv.size = 4;
-        console.warn('Размер должен быть между 1 и 20. Используется значение по умолчанию (4).');
+        console.warn('Размер должен быть между 1 и 40. Используется значение по умолчанию (4).');
       }
-      generateQR(argv.text, argv.size, argv.small);
+      generateQR(argv.text, argv.version, argv.small);
     }
   )
   .strict()
